@@ -1,0 +1,22 @@
+# Virtual Environment
+venv/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Logs
+logs/
+
+# Generated Reports
+reports/
+
+# Recovered Files
+recovered_files/
+
+# OS Files
+.DS_Store
+Thumbs.db
