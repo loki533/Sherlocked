@@ -8,6 +8,12 @@ class Case:
         self.evidence_path = evidence_path
         self.created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        #forensic data to be filled later
+        self.hashes={}
+        self.metadata=[]
+        self.timeline=[]
+        self.recovered_files=[]
+
     #converting the case object to dictionary
     #since custom write onto JSON not possible
 

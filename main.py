@@ -7,21 +7,14 @@ console = Console()
 console.print("[bold green]Welcome to Sherlocked[/bold green]")
 console.print("[cyan]Digital Forensics Investigation Toolkit[/cyan]")
 
+file_path ="evidence/hello.txt" 
 
-print(HashCalculator.calculate_hash(
-    "evidence/hello.txt",
-    "md5"
-))
+hashes = HashCalculator.calculate_all(
+    file_path
+)
 
-print(HashCalculator.calculate_hash(
-    "evidence/hello.txt",
-    "sha1"
-))
+print(hashes)
 
-print(HashCalculator.calculate_hash(
-    "evidence/hello.txt",
-    "sha256"
-))
 
 manager = CaseManager()      # Create ONE object
 

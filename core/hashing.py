@@ -4,19 +4,27 @@ import hashlib
 class HashCalculator:
 
     @staticmethod
-    def calculate_hash(file_path, algorithm):
+    def calculate_all(file_path):
 
-        hasher = hashlib.new(algorithm)
+        md5 = hashlib.md5()
+        sha1 = hashlib.sha1()
+        sha256 = hashlib.sha256()
 
         with open(file_path, "rb") as file:
 
             while True:
 
-                chunk = file.read(4096)
+                chunk = file.read(4096) #read 4kb at a time
 
                 if not chunk:
                     break
 
-                hasher.update(chunk)
+                md5.update(chunk)
+                sha1.update(chunk)
+                sha256.update(chunk)
 
-        return hasher.hexdigest()
+        return {
+            "md5": md5.hexdigest(),
+            "sha1": sha1.hexdigest(),
+            "sha256": sha256.hexdigest()
+        }
