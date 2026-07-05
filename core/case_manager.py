@@ -1,32 +1,37 @@
-import os
 import json
 
 from core.case import Case
+from config import CASES_DIR
+
 
 class CaseManager:
-    CASE_DIRECTORY = "cases"
+
     def create_case(self):
+        """
+        Creates a new investigation case and stores it on disk.
+        """
 
-        case_id = input("Case ID: ")
-        investigator = input("Investigator: ")
-        description = input("Description: ")
-        evidence_path = input("Evidence Path: ")
+        case_id = input("Case ID: ").strip()
+        investigator = input("Investigator: ").strip()
+        description = input("Description: ").strip()
+        evidence_path = input("Evidence Path: ").strip()
 
-        case=Case(
-            case_id,
-            investigator,
-            description,
-            evidence_path
+        case = Case(
+            case_id=case_id,
+            investigator=investigator,
+            description=description,
+            evidence_path=evidence_path
         )
 
-        folder = os.path.join(self.CASE_DIRECTORY,case.case_id)
+        case_folder = CASES_DIR / case.case_id
+        case_folder.mkdir(parents=True, exist_ok=True)
 
-        os.makedirs(folder, exist_ok=True)
-
-        with open(os.path.join(folder, "case.json"), "w") as file:
+        with open(case_folder / "case.json", "w") as file:
             json.dump(case.to_dict(), file, indent=4)
 
-        with open(os.path.join(folder, "notes.txt"), "w") as file:
-            file.write("Investigation Notes\n")
+        with open(case_folder / "notes.txt", "w") as file:
+            file.write("=== Investigation Notes ===\n")
 
-        print("\nCase created successfully.")
+        print(f"\n✅ Case '{case.case_id}' created successfully.")
+
+        return case
