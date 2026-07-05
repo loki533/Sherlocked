@@ -1,47 +1,58 @@
 from rich.console import Console
+
 from core.case_manager import CaseManager
-from modules.hashing import HashCalculator
-from core.evidence_scanner import EvidenceScanner
-from modules.metadata import MetadataExtractor
+from core.evidence_analyzer import EvidenceAnalyzer
+from core.logger import logger
 
 console = Console()
 
-console.print("[bold green]Welcome to Sherlocked[/bold green]")
-console.print("[cyan]Digital Forensics Investigation Toolkit[/cyan]")
+manager = CaseManager()
+analyzer = EvidenceAnalyzer()
 
+logger.info("Sherlocked started")
 
-
-manager = CaseManager()      # Create ONE object
-case = manager.create_case()
-files = EvidenceScanner.scan(case.evidence_path)
-metadata = []
-
-for file in files:
-    metadata.append(MetadataExtractor.extract(file))
-
-
-case.metadata = metadata
-print(case.metadata)
-
-
+console.print(
+    "[bold cyan]"
+    + "=" * 50
+    + "\n      SHERLOCKED"
+    + "\n Digital Forensics Investigation Toolkit"
+    + "\n"
+    + "=" * 50
+    + "[/bold cyan]"
+)
 
 while True:
 
-    print("\n========================")
-    print("      SHERLOCKED")
-    print("========================")
-    print("1. Create New Case")
-    print("2. Exit")
+    console.print("\n[bold]Main Menu[/bold]")
+    console.print("1. Create New Case")
+    console.print("2. Exit")
 
     choice = input("\nChoice: ")
 
     if choice == "1":
-        manager.create_case()
+
+        case = manager.create_case()
+
+        logger.info(f"Case created: {case.case_id}")
+
+        analyzer.analyze(case)
+
+        manager.save_case(case)
+
+        logger.info(f"Evidence analysis completed for {case.case_id}")
+
+        console.print(
+            f"\n[green]Analysis completed for {case.case_id}[/green]"
+        )
 
     elif choice == "2":
+
+        logger.info("Sherlocked closed")
+
+        console.print("\nGoodbye!")
+
         break
 
     else:
-        print("Invalid option.")
-    
 
+        console.print("[red]Invalid option[/red]")

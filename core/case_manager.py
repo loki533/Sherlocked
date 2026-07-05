@@ -2,6 +2,7 @@ import json
 
 from core.case import Case
 from config import CASES_DIR
+from core.logger import logger
 
 
 class CaseManager:
@@ -33,5 +34,16 @@ class CaseManager:
             file.write("=== Investigation Notes ===\n")
 
         print(f"\n✅ Case '{case.case_id}' created successfully.")
+        logger.info(f"Case {case.case_id} created")
 
         return case
+
+    def save_case(self, case):
+
+        folder = CASES_DIR / case.case_id
+
+        with open(folder / "case.json", "w") as file:
+
+            json.dump(case.to_dict(), file, indent=4)
+            
+        logger.info(f"Case {case.case_id} saved")
