@@ -1,58 +1,55 @@
-from rich.console import Console
-
 from core.case_manager import CaseManager
 from core.evidence_analyzer import EvidenceAnalyzer
+from core.ui import show_banner, show_menu
 from core.logger import logger
-
-console = Console()
 
 manager = CaseManager()
 analyzer = EvidenceAnalyzer()
 
+current_case = None
+
 logger.info("Sherlocked started")
 
-console.print(
-    "[bold cyan]"
-    + "=" * 50
-    + "\n      SHERLOCKED"
-    + "\n Digital Forensics Investigation Toolkit"
-    + "\n"
-    + "=" * 50
-    + "[/bold cyan]"
-)
+show_banner()
 
 while True:
 
-    console.print("\n[bold]Main Menu[/bold]")
-    console.print("1. Create New Case")
-    console.print("2. Exit")
-
-    choice = input("\nChoice: ")
+    choice = show_menu()
 
     if choice == "1":
 
-        case = manager.create_case()
-
-        logger.info(f"Case created: {case.case_id}")
-
-        analyzer.analyze(case)
-
-        manager.save_case(case)
-
-        logger.info(f"Evidence analysis completed for {case.case_id}")
-
-        console.print(
-            f"\n[green]Analysis completed for {case.case_id}[/green]"
-        )
+        current_case = manager.create_case()
 
     elif choice == "2":
 
-        logger.info("Sherlocked closed")
+        print("Coming Soon")
 
-        console.print("\nGoodbye!")
+    elif choice == "3":
+
+        print("Coming Soon")
+
+    elif choice == "4":
+
+        if current_case is None:
+
+            print("Create/Open a case first.")
+
+        else:
+
+            analyzer.analyze(current_case)
+
+            manager.save_case(current_case)
+
+    elif choice == "5":
+
+        print("Coming Soon")
+
+    elif choice == "6":
+
+        logger.info("Application closed")
 
         break
 
     else:
 
-        console.print("[red]Invalid option[/red]")
+        print("Invalid option.")

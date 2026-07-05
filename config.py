@@ -1,6 +1,6 @@
 from pathlib import Path
 
-# Root directory of the project
+# Root directory 
 BASE_DIR = Path(__file__).resolve().parent
 
 # Project folders
@@ -9,5 +9,5 @@ EVIDENCE_DIR = BASE_DIR / "evidence"
 REPORTS_DIR = BASE_DIR / "reports"
 LOGS_DIR = BASE_DIR / "logs"
 
-# Hash algorithms used throughout the project
+# Hash algorithms used 
 HASH_ALGORITHMS = ["md5", "sha1", "sha256"]
