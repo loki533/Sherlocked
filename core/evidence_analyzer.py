@@ -13,11 +13,6 @@ class EvidenceAnalyzer:
         logger.info("Scanning evidence folder")
 
         files = EvidenceScanner.scan(case.evidence_path)
-        info = MetadataExtractor.extract(file)
-
-        info["hashes"] = HashCalculator.calculate_all(file)
-        info["signature"] = SignatureAnalyzer.identify(file)
-
 
         metadata = []
 
@@ -28,6 +23,13 @@ class EvidenceAnalyzer:
             info = MetadataExtractor.extract(file)
 
             info["hashes"] = HashCalculator.calculate_all(file)
+
+            info["signature"] = SignatureAnalyzer.identify(file)
+
+            info["suspicious"] = SignatureAnalyzer.is_suspicious(
+                file,
+                info["signature"]
+            )
 
             metadata.append(info)
 
