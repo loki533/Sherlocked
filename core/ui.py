@@ -6,30 +6,12 @@ console = Console()
 
 def show_banner():
 
-    from rich.console import Console
-from rich.panel import Panel
-from rich.align import Align
-
-console = Console()
-
-
-def show_banner():
-
-    banner = """
-███████╗██╗  ██╗███████╗██████╗ ██╗      ██████╗  ██████╗██╗  ██╗███████╗██████╗
-██╔════╝██║  ██║██╔════╝██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
-███████╗███████║█████╗  ██████╔╝██║     ██║   ██║██║     █████╔╝ █████╗  ██║  ██║
-╚════██║██╔══██║██╔══╝  ██╔══██╗██║     ██║   ██║██║     ██╔═██╗ ██╔══╝  ██║  ██║
-███████║██║  ██║███████╗██║  ██║███████╗╚██████╔╝╚██████╗██║  ██╗███████╗██████╔╝
-╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═════╝
-"""
-
     console.print(
-        Panel(
-            Align.center(f"[bold cyan]{banner}[/bold cyan]"),
-            title="[green]v1.0[/green]",
-            subtitle="[yellow]Digital Forensics Framework[/yellow]",
-            border_style="cyan"
+        Panel.fit(
+            "[bold cyan]SHERLOCKED[/bold cyan]\n"
+            "[white]Digital Forensics Investigation Toolkit[/white]",
+            border_style="cyan",
+            padding=(1, 8)
         )
     )
 
@@ -40,8 +22,8 @@ def show_menu():
 
     console.print("[green]1.[/green] 📁 Create New Case")
     console.print("[green]2.[/green] 📂 Open Existing Case")
-    console.print("[green]3.[/green] 📊 View Case Information")
-    console.print("[green]4.[/green] 🔍 Analyze Evidence")
+    console.print("[green]3.[/green] 🔍 Analyze Evidence")
+    console.print("[green]4.[/green] ♻ Recover Deleted Files")
     console.print("[green]5.[/green] 📑 Generate Report")
     console.print("[green]6.[/green] 🚪 Exit")
 

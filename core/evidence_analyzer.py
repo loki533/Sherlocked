@@ -2,6 +2,7 @@ from modules.scanner import EvidenceScanner
 from modules.metadata import MetadataExtractor
 from modules.hashing import HashCalculator
 from modules.signature import SignatureAnalyzer
+from modules.classifier import FileClassifier
 
 from core.logger import logger
 
@@ -30,6 +31,8 @@ class EvidenceAnalyzer:
                 file,
                 info["signature"]
             )
+
+            info["category"] = FileClassifier.classify(file)
 
             metadata.append(info)
 
