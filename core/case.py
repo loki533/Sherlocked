@@ -26,3 +26,17 @@ class Case:
             "created_at":self.created_at,
 
     }
+
+    @staticmethod
+    def from_dict(data):
+        case = Case(
+            data["case_id"],
+            data["investigator"],
+            data["description"],
+            data["evidence_path"]
+        )
+
+        case.created_at = data["created_at"]
+        case.metadata = data.get("metadata", [])
+
+        return case

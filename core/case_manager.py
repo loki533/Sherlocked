@@ -3,6 +3,7 @@ import json
 from core.case import Case
 from config import CASES_DIR
 from core.logger import logger
+import os
 
 
 class CaseManager:
@@ -47,3 +48,55 @@ class CaseManager:
             json.dump(case.to_dict(), file, indent=4)
             
         logger.info(f"Case {case.case_id} saved")
+    
+    def open_case(self):
+
+        if not CASES_DIR.exists():
+
+            print("No cases found.")
+            return None
+
+        cases = []
+
+        for folder in CASES_DIR.iterdir():
+
+            if folder.is_dir():
+                cases.append(folder)
+
+        if not cases:
+
+            print("No existing cases.")
+            return None
+
+        print("\nExisting Cases")
+
+        for i, folder in enumerate(cases, start=1):
+
+            print(f"{i}. {folder.name}")
+
+        try:
+            choice = int(input("\nSelect case: "))
+
+        except ValueError:
+
+            print("Invalid input.")
+            return None
+
+        if choice < 1 or choice > len(cases):
+
+            print("Invalid selection.")
+            return None
+
+        selected_folder = cases[choice - 1]
+
+        with open(selected_folder / "case.json", "r") as file:
+
+            data = json.load(file)
+
+        case = Case.from_dict(data)
+
+        logger.info(f"Opened case {case.case_id}")
+
+        print(f"\n✅ Opened Case: {case.case_id}")
+
+        return case
