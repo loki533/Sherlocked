@@ -1,4 +1,5 @@
 from rich.console import Console
+from pathlib import Path
 
 from core.case_manager import CaseManager
 from core.evidence_analyzer import EvidenceAnalyzer
@@ -6,8 +7,13 @@ from core.logger import logger
 from core.ui import show_banner, show_menu
 from core.table import display_inventory
 from core.timeline_table import display_timeline
+from core.browser_table import display_history
+from core.download_table import display_downloads
 
 from modules.timeline import TimelineGenerator
+from modules.browser.chrome import ChromeArtifacts
+
+
 
 
 console = Console()
@@ -79,9 +85,26 @@ while True:
 
     elif choice == "5":
 
-        print("Coming Soon")
+        print("Browser Artifacts")
+
+        logger.info("Extraction of Browser History")
+
+        history = ChromeArtifacts.extract(Path.home() /
+        "AppData/Local/Google/Chrome/User Data/Default/History")
+
+        display_history(history)
 
     elif choice == "6":
+
+        logger.info("Extraced Browser Downloads")
+        history_path = Path.home() / "AppData/Local/Google/Chrome/User Data/Default/History"
+        
+        downloads = ChromeArtifacts.extract_downloads(history_path)
+        display_downloads(downloads)
+
+
+
+    elif choice == "7":
 
         logger.info("Application closed")
 

@@ -1,6 +1,8 @@
 from modules.scanner import EvidenceScanner
 from modules.metadata import MetadataExtractor
 from modules.hashing import HashCalculator
+from modules.signatures import SignatureAnalyzer
+from modules.mismatch_detector import MismatchDetector
 
 from core.logger import logger
 
@@ -17,11 +19,16 @@ class EvidenceAnalyzer:
 
         for file in files:
 
-            logger.info(f"Analyzing {file}")
-
             info = MetadataExtractor.extract(file)
 
             info["hashes"] = HashCalculator.calculate_all(file)
+
+            signature = SignatureAnalyzer.identify(file)
+
+            info["signature"] = signature["signature"]
+            info["category"] = signature["category"]
+
+            info["suspicious"] = MismatchDetector.detect(file,info["signature"])
 
             metadata.append(info)
 
