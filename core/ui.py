@@ -44,6 +44,7 @@ def show_menu():
     console.print("[green]4.[/green] 🔍 Analyze Evidence")
     console.print("[green]5.[/green] 📑 Extract Browser history")
     console.print("[green]6.[/green] 📑 Extract Browser Downloads ")
-    console.print("[green]7.[/green] 🚪 Exit")
+    console.print("[green]7.[/green] 📑 Generate Report ")
+    console.print("[green]8.[/green] 🚪 Exit")
 
     return input("\nChoice: ")

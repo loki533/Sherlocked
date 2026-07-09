@@ -1,5 +1,6 @@
 from rich.console import Console
 from pathlib import Path
+import webbrowser
 
 from core.case_manager import CaseManager
 from core.evidence_analyzer import EvidenceAnalyzer
@@ -9,6 +10,7 @@ from core.table import display_inventory
 from core.timeline_table import display_timeline
 from core.browser_table import display_history
 from core.download_table import display_downloads
+from core.report_generator import ReportGenerator
 
 from modules.timeline import TimelineGenerator
 from modules.browser.chrome import ChromeArtifacts
@@ -102,9 +104,23 @@ while True:
         downloads = ChromeArtifacts.extract_downloads(history_path)
         display_downloads(downloads)
 
-
-
     elif choice == "7":
+
+        if current_case is None:
+
+            print("Create/Open a case first.")
+
+        else:
+
+            report = ReportGenerator.generate(current_case)
+
+            print(f"\nReport generated at {report}")
+
+            webbrowser.open(report.resolve().as_uri())
+
+
+
+    elif choice == "8":
 
         logger.info("Application closed")
 
