@@ -14,6 +14,7 @@ from core.report_generator import ReportGenerator
 
 from modules.timeline import TimelineGenerator
 from modules.browser.chrome import ChromeArtifacts
+from modules.image_analysis import ISOAnalyzer
 
 
 
@@ -27,6 +28,32 @@ current_case = None
 logger.info("Sherlocked started")
 
 show_banner()
+
+
+iso_tester = ISOAnalyzer("evidence/test_evidence.iso")
+
+report = iso_tester.analyze()
+
+print("Image:", report["image_name"])
+print("Files:", report["total_files"])
+print("Directories:", report["total_directories"])
+
+print("\nExecutables:")
+
+for file in report["executables"]:
+    print(file)
+
+print("\nHidden Files:")
+for file in report["hidden_files"]:
+    print(file)
+
+print("\nSuspicious:")
+for file in report["suspicious_files"]:
+    print(file)
+
+print("\nLargest Files:")
+for file in report["largest_files"]:
+    print(file)
 
 while True:
 
