@@ -1,8 +1,9 @@
 import hashlib
 from io import BytesIO
 from pathlib import Path
-
+import struct
 import pycdlib
+
 
 
 class ISOAnalyzer:
@@ -161,3 +162,84 @@ class ISOAnalyzer:
         except Exception:
 
             return None
+        
+class RawImageAnalyzer:
+    
+    def __init__(self,image_path):
+        self.image_path = Path(image_path)
+
+    def analyze(self):
+        with open(self.image_path,"rb") as f:
+            #Read the master boot record(first 512 bytes)
+            boot_sector = f.read(512)
+            f.seek(512)
+            gpt_header=f.read(8)
+
+        return{
+            "image_name":self.image_path.name,
+            "image_size":self.image_path.stat().st_size,
+            "boot_signature":self.get_boot_signature(boot_sector),
+            "partition_scheme":self.detect_partition_scheme(gpt_header),
+            "file_system":self.detect_filesystem(boot_sector),
+            "boot_info":self.parse_boot_sector(boot_sector),
+        }   
+    
+    def get_boot_signature(self,boot_sector):
+        #valid boot sectors must end with 0x55A at offsets 510-512
+        sig = boot_sector[510:512]
+        return sig.hex().upper()
+    
+
+    def detect_partition_scheme(self,gpt_header):
+        #GPT disks stores "EFI PART" the header at the begining
+        if (gpt_header==b"EFI PART"):
+            return "GPT"
+        
+        return "MBR"
+
+    def detect_file_system(self,boot_sector):
+        #File system striing is usually at 3-10th bytes
+        fs = boot_sector[3:11].decode(errors="ignore").strip()
+
+        if "NTFS" in fs:
+            return "NTFS"
+        
+        elif "FAT32" in fs:
+            return "FAT32"
+
+        elif "EXFAT" in fs.upper():
+            return "EXFAT"
+
+        return "Unknown or Raw MBR"
+    
+    def parse_boot_sector(self,boot_sector):
+        
+        """
+        Parses the BIOS Parameter Block (BPB) for NTFS volumes.
+        Uses Little-Endian format (<) to unpack binary data types:
+        H = unsigned short (2 bytes), Q = unsigned long long (8 bytes)
+        """
+        try:
+            # Only attempt to parse if it looks like an NTFS filesystem boot sector
+            fs = boot_sector[3:11].decode(errors="ignore").strip()
+            if "NTFS" not in fs:
+                return None
+                
+            bytes_per_sector = struct.unpack("<H", boot_sector[11:13])[0]
+            sectors_per_cluster = boot_sector[13]
+            total_sectors = struct.unpack("<Q", boot_sector[40:48])[0]
+            mft_cluster = struct.unpack("<Q", boot_sector[48:56])[0]
+
+            return {
+                "bytes_per_sector": bytes_per_sector,
+                "sectors_per_cluster": sectors_per_cluster,
+                "cluster_size": bytes_per_sector * sectors_per_cluster,
+                "total_sectors": total_sectors,
+                "mft_cluster": mft_cluster,
+            }
+        except Exception:
+            return {"error": "Failed to parse BPB metadata"}
+
+    
+
+
