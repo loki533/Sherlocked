@@ -15,6 +15,7 @@ from core.report_generator import ReportGenerator
 from modules.timeline import TimelineGenerator
 from modules.browser.chrome import ChromeArtifacts
 from modules.image_analysis import ISOAnalyzer
+from modules.image_analysis import RawImageAnalyzer
 
 
 
@@ -31,6 +32,7 @@ show_banner()
 
 
 iso_tester = ISOAnalyzer("evidence/test_evidence.iso")
+image_path = Path("evidence/windows_disk.dd")
 
 report = iso_tester.analyze()
 
@@ -132,6 +134,51 @@ while True:
         display_downloads(downloads)
 
     elif choice == "7":
+        if not image_path.exists():
+            print(f"[!] Error: Target evidence file not found at: {image_path}")
+            print("    Please verify the path and try again.")
+
+            break
+        
+        try:
+            logger.info("Started Disk image analysing")
+
+            # 2. Instantiate y module dispatcher
+            print(f"[*] Loading image data from: {image_path.name}")
+            analyzer = RawImageAnalyzer(image_path)
+            
+            # 3. Execute the structural breakdown
+            report = analyzer.analyze()
+            
+            # 4. Display Core Image Metadata
+            print("\n[+] Image Information:")
+            print(f"    Name:       {report['image_name']}")
+            print(f"    File Size:  {report['image_size']:,} bytes")
+            print(f"    Signature:  {report['boot_signature']} (Valid MBR Marker)")
+            print(f"    Layout:     {report['partition_scheme']}")
+            print("-" * 50)
+            
+            # 5. Display Parsed Partition Map Entries
+            print("[+] Parsed MBR Partition Table Map:")
+            if not report["partitions"]:
+                print("    No active primary partitions found (Empty structural slots).")
+            else:
+                for part in report["partitions"]:
+                    boot_marker = "(*) ACTIVE/BOOTABLE" if part["bootable"] else "INACTIVE"
+                    
+                    print(f"\n    [Slot #{part['partition']}] Partition Metadata:")
+                    print(f"    └── Type:          {part['type']}")
+                    print(f"    └── Status:        {boot_marker}")
+                    print(f"    └── Starting LBA:  {part['start_lba']}")
+                    print(f"    └── Total Sectors: {part['total_sectors']}")
+                    print(f"    └── Computed Size: {part['size_gb']} GB")
+                    
+        except Exception as e:
+            print(f"\n[!] Critical processing failure: {e}")
+            
+        print("\n" + "=" * 50)
+                
+    elif choice == "8":
 
         if current_case is None:
 
@@ -146,11 +193,10 @@ while True:
             webbrowser.open(report.resolve().as_uri())
 
 
+        
 
-    elif choice == "8":
-
-        logger.info("Application closed")
-
+    elif choice == "9":
+        logger.info("Application Closed")
         break
 
     else:
