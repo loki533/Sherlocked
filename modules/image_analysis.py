@@ -4,7 +4,58 @@ from pathlib import Path
 import struct
 import pycdlib
 
+"""
++-----------------------------------------------------------+
+| Sector 0                                                   |
+| Master Boot Record (MBR)                                  |
++-----------------------------------------------------------+
+| Partition Entry 1                                         |
+| Partition Entry 2                                         |
+| Partition Entry 3                                         |
+| Partition Entry 4                                         |
++-----------------------------------------------------------+
+| Sector 1 ...                                               |
+| Filesystem starts (NTFS/FAT32/etc.)                       |
++-----------------------------------------------------------+
 
+"""
+
+#inside each MBR
+
+"""
+Offset      Size
+
+0x000       446 bytes    Bootloader
+
+0x1BE       16 bytes     Partition Entry 1
+
+0x1CE       16 bytes     Partition Entry 2
+
+0x1DE       16 bytes     Partition Entry 3
+
+0x1EE       16 bytes     Partition Entry 4
+
+0x1FE       2 bytes      Signature (55 AA)
+
+"""
+
+PARTITION_TYPES = {
+    0x00: "Unused",
+    0x01: "FAT12",
+    0x04: "FAT16",
+    0x05: "Extended",
+    0x06: "FAT16B",
+    0x07: "NTFS / exFAT",
+    0x0B: "FAT32",
+    0x0C: "FAT32 LBA",
+    0x0E: "FAT16 LBA",
+    0x0F: "Extended LBA",
+    0x82: "Linux Swap",
+    0x83: "Linux",
+    0x8E: "Linux LVM",
+    0xAF: "macOS HFS",
+    0xEE: "GPT Protective",
+}
 
 class ISOAnalyzer:
     """
@@ -174,6 +225,8 @@ class RawImageAnalyzer:
             boot_sector = f.read(512)
             f.seek(512)
             gpt_header=f.read(8)
+            partitions = self.parse_partition_table(boot_sector)
+
 
         return{
             "image_name":self.image_path.name,
@@ -182,6 +235,7 @@ class RawImageAnalyzer:
             "partition_scheme":self.detect_partition_scheme(gpt_header),
             "file_system":self.detect_filesystem(boot_sector),
             "boot_info":self.parse_boot_sector(boot_sector),
+            "partitions":partitions,
         }   
     
     def get_boot_signature(self,boot_sector):
@@ -239,7 +293,67 @@ class RawImageAnalyzer:
             }
         except Exception:
             return {"error": "Failed to parse BPB metadata"}
+        
+    def parse_partition_table(self,boot_sector):
 
+        partitions = []
+        partition_offset = 446
+            
+        for i in range (4): #read the 4 partitions
+            entry = boot_sector[
+            partition_offset:partition_offset + 16]
+
+            partition_offset += 16
+        
+            boot_flag = entry[0] #decides if its bootable , if 0x00 -> not bootable
+            partition_type = entry[4] #0x83 -> LINUX,0x07 -> NTFS/exFAT 
+
+            start_lba = int.from_bytes(entry[8:12],"little") #tells us the start of the logical byte address
+            """important to calculate , so that prog knows how many bytes to skip to reach the start of the filesystem"""
+
+            total_sectors = int.from_bytes(entry[12:16],"little" )
+
+            if partition_type == 0:
+                continue
+
+            ptype = PARTITION_TYPES.get(partition_type,f"Unknown (0x{partition_type:02X})")
+
+            # Calculate sizing based on standard 512 bytes per sector
+            size_bytes = total_sectors * 512
+            size_gb = size_bytes / (1024**3)
+
+            # Append structured metadata to our results list
+            partitions.append({
+                "partition": i + 1,
+                "bootable": boot_flag == 0x80,
+                "type": ptype,
+                "start_lba": start_lba,
+                "total_sectors": total_sectors,
+                "size_gb": round(size_gb, 2),
+            })
+                
+        return partitions
+
+
+
+
+
+class ImageAnalyzer:
+
+    @staticmethod
+    def analyze(path):
+
+        ext = Path(path).suffix.lower()
+
+        if ext == "iso":
+            return ISOAnalyzer(path).analyze()
+
+        elif ext in (".img",".dd",".raw"):
+            return RawImageAnalyzer(path).analyze()
+        
+        else:
+            raise ValueError(f"Unsupported Format : {ext}")
+        
     
 
 
