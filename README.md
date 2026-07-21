@@ -461,20 +461,3 @@ python main.py
 Sherlocked is being developed as a learning-oriented digital forensics framework to understand the internal workings of forensic software rather than relying solely on existing tools. The project emphasizes filesystem structures, forensic artifact extraction, evidence integrity, and investigative workflows while maintaining an extensible architecture for future forensic capabilities.
 
 ---
-
-# 📜 License
-
-This project is intended for educational and research purposes.
-
-```
-
-## A suggestion
-
-At this stage, your project has evolved well beyond a simple Python utility. I also recommend adding the following to the repository:
-
-- **`docs/architecture.md`** – a detailed explanation of the framework architecture.
-- **`docs/forensics-flow.md`** – diagrams showing evidence flow (Disk → MBR → Partition → NTFS → MFT → Deleted Files).
-- **`docs/screenshots/`** – screenshots of the terminal output and generated reports.
-- **GitHub Actions** – to automatically run tests on every commit.
-
-These additions will make the repository look much more like a polished open-source forensic framework and stand out to recruiters and collaborators.
