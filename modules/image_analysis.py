@@ -221,7 +221,10 @@ class RawImageAnalyzer:
 
     def analyze(self):
         with open(self.image_path,"rb") as f:
+
             #Read the master boot record(first 512 bytes)
+            #MBR is responsible for BIOS,Partition table
+
             boot_sector = f.read(512)
             f.seek(512)
             gpt_header=f.read(8)
@@ -333,6 +336,18 @@ class RawImageAnalyzer:
             })
                 
         return partitions
+
+    def read_ntfs_boot_sector(self,start_lba):
+
+        with open (self.image_path,"rb") as f:
+
+            f.seek(start_lba*512) #skips the MFT , and jumpts to the NTFS
+            return f.read(512)  
+
+    def parse_ntfs_boot_sector(self,boot_sector):
+
+        signature = boot_sector[3:11].decode(errors="ignore").strip()
+        
 
 
 
