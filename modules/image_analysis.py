@@ -346,11 +346,53 @@ class RawImageAnalyzer:
 
     def parse_ntfs_boot_sector(self,boot_sector):
 
-        signature = boot_sector[3:11].decode(errors="ignore").strip()
-        
+        signature = boot_sector[3:11].decode(errors="ignore").strip() #has to be NTFS
+        bytes_per_sector = int.from_bytes(boot_sector[11:13],"little") #usually 512
+        sectors_per_cluster = boot_sector[13]
+        cluster_size = (bytes_per_sector *sectors_per_cluster)
 
+        total_sectors = int.from_bytes(boot_sector[40:48],"little")
+        mft_cluster = int.from_bytes(boot_sector[48:56],"little")
 
+    def read_mft_record(self,record_number,mft_offset,record_size=1024):#mft_offset is calculated from NTFS boot sector
 
+        record_offset = (mft_offset)+(record_number*record_size)
+
+        with open(self.image_path,"rb") as image:
+            image.seek(record_offset)
+            record = image.read(record_size)
+
+        if len(record)!= record_size:
+            return None
+
+        signature = record[0:4]
+
+        if signature!=b"FILE":
+            return None
+
+        sequence_number = int.from_bytes(record[16:18],"little")
+        hard_links =int.from_bytes(record[18:20],"little")
+        first_attribute = int.from_bytes(record[20:22],"little")
+        flags =int.from_bytes(record[22:24],"little")
+        used_size=int.from_bytes(record[24:28],"little")
+        allocated_size =int.from_bytes(record[28:32],"little")
+        base_record=int.from_bytes(record[32:40],"little")
+        next_attribute_id =int.from_bytes(record[40:42],"little")
+
+        return{
+            "record_number " : record_number,
+            "record_offset " : record_offset,
+            "signature " : "File",
+            "sequence_number" : sequence_number,
+            "hard_links" : hard_links,
+            "first_attribute_offset" : first_attribute,
+            "flags" : flags,
+            "used_size" : used_size,
+            "allocatted size " : allocated_size,
+            "base_record " : base_record,
+            "next_attribute id " : next_attribute_id,
+            "raw_record " : record
+        }
 
 
 class ImageAnalyzer:

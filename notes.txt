@@ -1,0 +1,70 @@
+MBR 
+bootloader -> location depends on bios/uefi
+if MBR -> loaded onto the first sector (Master boot Record)
+problem -> this works only on hardrives of 2TB , since it is closely tied to BIOS nd BIOS supports only uto 2TB
+even if it exceeds it'll support only the first 2 TB
+ending is marked by 55AA
+
+GPT(GUID Partition Table)
+used in UEFI (18 TB)
+the partition right after the first 512 bytes , used for EFI
+has backup data at the end of the disk
+
+EFI
+partition table read -> points to EFI -> loads the boot files
+( can have multiple boot files of diff os)
+
+Swap Parition
+
+Primary Partition
+older MBRs have 4 diff paritions , which can store diff OS's
+GUID partitions 128 partitions
+
+Logical Partition
+
+Disk serial number (bytes 440 to 443) unique value assigned by manufacturer
+
+Partition tables
+each partition metadata 16 bytes
+
+first 446 bytes -> bootstrap
+next 64 -> partition table 
+offset 
+0x80 indicates the partition is active
+0x07 indicates the partition type
+0x 00 02 03 00 -> indicates number of sectors 
+
+starting sector offset = starting sector * sector size
+
+resident and non resident data
+every MFT record has 1kb allocated (if data more than that it stored in other cluserers , these types of files are known as non-resident files)
+
+attributes in MFT
+
+attribute-id 
+0x10 contains file creation , permissions first 8 bytes -> date created(when u copied ) the rest of the info remains the same
+0x20 attributes that don't fit in the MFT (non-resident data) are listed here
+0x30 file name in Unicode
+0x40 Ownership and who has access to the files are listed here
+0x50 has the Access Control list
+0x60 Volume Unique file identifier
+0x70 Volume info
+0x80 data for resident and non resident files
+0x90 Index root
+0xA0 index allocation
+
+Clusters in MFT 
+used for non resident data
+
+At this stage, your project has evolved well beyond a simple Python utility. I also recommend adding the following to the repository:
+
+- **`docs/architecture.md`** – a detailed explanation of the framework architecture.
+- **`docs/forensics-flow.md`** – diagrams showing evidence flow (Disk → MBR → Partition → NTFS → MFT → Deleted Files).
+- **`docs/screenshots/`** – screenshots of the terminal output and generated reports.
+- **GitHub Actions** – to automatically run tests on every commit.
+
+These additions will make the repository look much more like a polished open-source forensic framework and stand out to recruiters and collaborators.
+
+4 to 6 -> MFT parser
+6 - 6:30 -> sleep
+6:30 - 7:30 -> workout
