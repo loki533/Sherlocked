@@ -189,26 +189,39 @@ class MFTParser:
 
         return {
 
-            "parent_record": parent_record,
-
+            "parent_record": parent_reference,
             "created": filetime_to_datetime(created),
-
             "modified": filetime_to_datetime(modified),
-
             "mft_modified": filetime_to_datetime(mft_modified),
-
             "accessed": filetime_to_datetime(accessed),
-
             "allocated_size": allocated_size,
-
             "real_size": real_size,
-
             "flags": flags,
-
             "namespace": namespace,
-
-            "filename": filename
+            "filename": file_name
         }
+
+    def scan_mft(self,max_records=1000):
+
+        records=[]
+
+        for record_number in range(max_records):
+
+            record = self.read_mft_record(record_number)
+
+            if record is None:
+                continue
+
+            attributes = self.parse_attributes(record["raw_record"])
+            record["attributes"] = attributes
+            record.pop("raw_record")
+
+            records.append(record)
+
+        return records
+
+
+
 
 
 
