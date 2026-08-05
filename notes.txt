@@ -68,3 +68,32 @@ These additions will make the repository look much more like a polished open-sou
 4 to 6 -> MFT parser
 6 - 6:30 -> sleep
 6:30 - 7:30 -> workout
+
+ Master File Table
+
+ ┌─────────────────────────────┐
+ │ Record 0   $MFT             │
+ ├─────────────────────────────┤
+ │ Record 1   $MFTMirr         │
+ ├─────────────────────────────┤
+ │ Record 2   $LogFile         │
+ ├─────────────────────────────┤
+ │ Record 3   $Volume          │
+ ├─────────────────────────────┤
+ │ Record 4   file1.txt        │
+ ├─────────────────────────────┤
+ │ Record 5   image.jpg        │
+ ├─────────────────────────────┤
+ │ Record 6   notes.pdf        │
+ └─────────────────────────────┘
+
+MFTmirr is a backup to the MFT , this is stored near to the centre of the physical disk to prevent damage that would affect both the primary MFT as well as the Backup
+
+each record is assigned 1kb for its metadata , even if it doesn't require those many … it takes up the same.
+	if the metadata exceeds that of 1kb , it stored in clusters and they are called non-resident data.
+
+disk->Partition->Boot sector->MFT offset->read 1024 bytes->check for file signature
+
+NTFS parsing 
+parsing the file information
+	in Windows unlike UNIX,file time is stored not as UNIX time but as FILETIME i.e how many 100 nano seconds past jan 1,1601

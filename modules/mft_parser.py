@@ -3,8 +3,20 @@ from io import BytesIO
 from pathlib import Path
 import struct
 import pycdlib
+from datetime import datetime, timedelta
+
+def filetime_to_datetime(filetime):
+
+    if filetime == 0:
+        return None
+
+    return datetime(1601, 1, 1) + timedelta(
+        microseconds=filetime / 10
+    )
 
 class MFTParser:
+
+    
 
     def __init__(self,image_path,mft_offset,record_size=1024):
 
@@ -67,12 +79,26 @@ class MFTParser:
 
     def parse_attributes(self,record):
 
+
+        ATTRIBUTE_TYPES = {
+            0x10: "$STANDARD_INFORMATION",
+            0x20: "$ATTRIBUTE_LIST",
+            0x30: "$FILE_NAME",
+            0x40: "$OBJECT_ID",
+            0x50: "$SECURITY_DESCRIPTOR",
+            0x60: "$VOLUME_NAME",
+            0x70: "$VOLUME_INFORMATION",
+            0x80: "$DATA",
+            0x90: "$INDEX_ROOT",
+            0xA0: "$INDEX_ALLOCATION",
+        }
+
         attributes = []
 
         offset = int.from_bytes(record[20:22],"little")
 
         while offset< len(record):
-            attr_type = int.from_bytes(record[offset:offset+4],"little")
+            attr_type = attribute_name = ATTRIBUTE_TYPES.get(attr_type,hex(attr_type))
 
             if attr_type == "0xFFFFFFFF":
                 break
