@@ -113,21 +113,16 @@ class MFTParser:
             if (attr_length == 0):
                 break
 
-            if attr_type == 0x10:
+            if (attr_type == 0x10):
                 parsed = self.parse_standard_information(record,offset)
-                attributes.append(
-                    {
-                        "type":attribute_name,
-                        "length":attr_length,
-                        "resident":resident==0,
-                        "id":attr_id,
-                        "offset" : offset,
-                        "data" : parsed
-                    }
-                )
+
+            elif(attr_type == 0x30):
+                parsed = self.parse_file_name(record,offset)
 
             else:
-                attributes.append(
+                parsed = None
+
+            attributes.append(
                     {
                         "type":attribute_name,
                         "length":attr_length,
@@ -168,4 +163,54 @@ class MFTParser:
             "accessed" : filetime_to_datetime(accessed),
             "attributes" : attributes
         }
+
+    def parse_file_name(self,record,attribute_offset):
+
+        content_offset = int.from_bytes(record[attribute_offset+20 : attribute_offset+22],"little")
+        start = attribute_offset + content_offset
+
+        parent_reference = int.from_bytes(record[start:start+8],"little")
+
+        created = filetime_to_datetime(int.from_bytes(record[start+8:start+16],"little"))
+        modified = filetime_to_datetime(int.from_bytes(record[start+16 : start+24],"little"))
+        mft_modified = filetime_to_datetime(int.from_bytes(record[start+24 : start+32],"little"))
+        accessed = filetime_to_datetime(int.from_bytes(record[start+32 : start+40],"little"))
+
+        allocated_size = int.from_bytes(record[start+40 : start+48],"little")
+        real_size = int.from_bytes(record[start+48 : start+56],"little")
+        flags = int.from_bytes(record[start+56 : start+60] ,"little")
+        name_length = record[start+64]
+
+        namespace = record[start+65]
+        #0 -> POSIX , 1 -> Win32 , 2 -> DOS ,3 -> Win32 + DOS
+
+        name_bytes = record[start+66:start+66+(name_length*2)]
+        file_name = name_bytes.decode("utf-16le",errors = "ignore")
+
+        return {
+
+            "parent_record": parent_record,
+
+            "created": filetime_to_datetime(created),
+
+            "modified": filetime_to_datetime(modified),
+
+            "mft_modified": filetime_to_datetime(mft_modified),
+
+            "accessed": filetime_to_datetime(accessed),
+
+            "allocated_size": allocated_size,
+
+            "real_size": real_size,
+
+            "flags": flags,
+
+            "namespace": namespace,
+
+            "filename": filename
+        }
+
+
+
+
 
