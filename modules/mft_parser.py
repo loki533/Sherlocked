@@ -98,28 +98,74 @@ class MFTParser:
         offset = int.from_bytes(record[20:22],"little")
 
         while offset< len(record):
-            attr_type = attribute_name = ATTRIBUTE_TYPES.get(attr_type,hex(attr_type))
+            attr_type = int.from_bytes(record[offset:offset+4] , "little")
+            attribute_name = ATTRIBUTE_TYPES.get(attr_type,hex(attr_type))
 
-            if attr_type == "0xFFFFFFFF":
+            if attr_type == 0xFFFFFFFF:
                 break
 
             attr_length = int.from_bytes(record[offset + 4 : offset + 8], "little")
             resident = record[offset + 8] #0 if resident , 1 if non-resident
             attr_id = int.from_bytes(record[offset + 14 : offset + 16], "little")
 
-            attributes.append(
-                {
-                    "type":attr_type,
-                    "length":attr_length,
-                    "resident":resident==0,
-                    "id":attr_id,
-                    "offset" : offset
-                }
-            )
+           
 
             if (attr_length == 0):
                 break
 
+            if attr_type == 0x10:
+                parsed = self.parse_standard_information(record,offset)
+                attributes.append(
+                    {
+                        "type":attribute_name,
+                        "length":attr_length,
+                        "resident":resident==0,
+                        "id":attr_id,
+                        "offset" : offset,
+                        "data" : parsed
+                    }
+                )
+
+            else:
+                attributes.append(
+                    {
+                        "type":attribute_name,
+                        "length":attr_length,
+                        "resident":resident==0,
+                        "id":attr_id,
+                        "offset" : offset
+
+                    }
+                )
+
             offset+=attr_length #to get the next record
 
-            return attributes
+        return attributes
+
+    def parse_standard_information(self,record,attribute_offset):
+        content_offset = int.from_bytes(record[attribute_offset+20:attribute_offset+22],"little")
+        start = attribute_offset + content_offset
+
+        if start + 36 > len(record):
+            return None
+        
+        #0x00 -> creation
+        #0x08 -> modified
+        #0x10 -> MFT modified
+        #0x18 -> accessed
+        created = int.from_bytes(record[start:start+8],"little")
+        modified = int.from_bytes(record[start+8 : start+16],"little")
+        mft_modified = int.from_bytes(record[start+16 : start+24],"little")
+        accessed = int.from_bytes(record[start+24 : start+32],"little")
+
+        #0x20 -> File attributes start
+        attributes = int.from_bytes(record[start+32 : start+36],"little")
+
+        return{
+            "created" : filetime_to_datetime(created),
+            "modified" : filetime_to_datetime(modified),
+            "mft_modified" : filetime_to_datetime(mft_modified),
+            "accessed" : filetime_to_datetime(accessed),
+            "attributes" : attributes
+        }
+
