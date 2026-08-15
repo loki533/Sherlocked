@@ -1,22 +1,25 @@
-# Virtual Environment
-venv/
+# Python packaging metadata
+*.egg-info/
 
-# Python Cache
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
 
-# VS Code
-.vscode/
+# Virtual environment
+venv/
+.venv/
+
+# Test evidence
+evidence/
+
+# Generated cases
+cases/
+
+# Generated reports
+reports/
 
 # Logs
 logs/
 
-# Generated Reports
-reports/
-
-# Recovered Files
-recovered_files/
-
-# OS Files
-.DS_Store
-Thumbs.db
+# IDE
+.vscode/

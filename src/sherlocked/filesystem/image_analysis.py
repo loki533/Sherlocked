@@ -236,7 +236,7 @@ class RawImageAnalyzer:
             "image_size":self.image_path.stat().st_size,
             "boot_signature":self.get_boot_signature(boot_sector),
             "partition_scheme":self.detect_partition_scheme(gpt_header),
-            "file_system":self.detect_filesystem(boot_sector),
+            "file_system":self.detect_file_system(boot_sector),
             "boot_info":self.parse_boot_sector(boot_sector),
             "partitions":partitions,
         }   
@@ -363,7 +363,7 @@ class ImageAnalyzer:
 
         ext = Path(path).suffix.lower()
 
-        if ext == "iso":
+        if ext == ".iso":
             return ISOAnalyzer(path).analyze()
 
         elif ext in (".img",".dd",".raw"):
