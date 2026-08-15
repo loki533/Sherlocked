@@ -1,7 +1,7 @@
 import sqlite3
 import shutil
 from pathlib import Path
-from modules.browser.utils import chrome_time
+from sherlocked.utils.time_utils import chrome_time
 
 
 class ChromeArtifacts:

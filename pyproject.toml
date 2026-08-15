@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "sherlocked"
+version = "0.2.0"
+description = "Digital Forensics Investigation Toolkit"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "rich",
+    "pycdlib",
+    "jinja2",
+]
+
+
+[project.scripts]
+sherlocked = "sherlocked.cli.main:main"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]

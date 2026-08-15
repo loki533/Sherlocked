@@ -1,14 +1,14 @@
 import logging
-from config import LOGS_DIR
 
-# Create logs directory if it doesn't exist
+from sherlocked.utils.paths import LOGS_DIR
+
+
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Create logger
 logger = logging.getLogger("Sherlocked")
 logger.setLevel(logging.INFO)
 
-# Prevent duplicate logs
+
 if not logger.handlers:
 
     file_handler = logging.FileHandler(

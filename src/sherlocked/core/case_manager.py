@@ -1,8 +1,8 @@
 import json
 
-from core.case import Case
-from config import CASES_DIR
-from core.logger import logger
+from sherlocked.core.case import Case
+from sherlocked.utils.paths import CASES_DIR
+from sherlocked.core.logger import logger
 import os
 
 
