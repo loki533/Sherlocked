@@ -1,25 +1,39 @@
 # Python packaging metadata
 *.egg-info/
 
-# Python cache
+# Virtual environment
+.venv/
+venv/
+
+# Python
 __pycache__/
 *.py[cod]
 
-# Virtual environment
-venv/
-.venv/
+# Build
+build/
+dist/
+*.egg-info/
 
-# Test evidence
-evidence/
-
-# Generated cases
+# Runtime investigation data
 cases/
-
-# Generated reports
-reports/
+evidence/
+recovered/
+recovered_files/
 
 # Logs
 logs/
+*.log
 
 # IDE
 .vscode/
+.idea/
+
+# Temporary files
+tempCodeRunnerFile.py
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+tempCodeRunnerFile.py

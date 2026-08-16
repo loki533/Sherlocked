@@ -19,9 +19,9 @@
     
     <div class="case-info">
         <h2>Case Details</h2>
-        <p><strong>Case ID:</strong> {{ case.case_id }}</p>
-        <p><strong>Investigator:</strong> {{ case.investigator }}</p>
-        <p><strong>Description:</strong> {{ case.description }}</p>
+        <p><strong>Case ID:</strong> Case001</p>
+        <p><strong>Investigator:</strong> loki</p>
+        <p><strong>Description:</strong> docx analyze test</p>
     </div>
 
     <h2>Evidence Summary</h2>
@@ -35,14 +35,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for file in case.metadata %}
-            <tr>
-                <td>{{ file.name }}</td>
-                <td>{{ file.category }}</td>
-                <td>{{ file.signature }}</td>
-                <td>{{ file.hashes.sha256 }}</td>
-            </tr>
-            {% endfor %}
+            
         </tbody>
     </table>
 </body>
