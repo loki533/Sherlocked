@@ -20,6 +20,9 @@ dist/
 /recovered/
 /recovered_files/
 
+# Generated reports
+/reports/
+
 # Logs
 logs/
 *.log
