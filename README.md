@@ -361,10 +361,3 @@ Sherlocked is an evolving learning project, not a production-grade forensic suit
 
 Sherlocked is intended for educational use and for the analysis of evidence and systems you are explicitly authorized to examine. Do not use this toolkit against systems, accounts, or data without proper authorization. The maintainers assume no responsibility for misuse.
 
-## License
-
-No `LICENSE` file is currently present in this repository. Licensing terms have not yet been specified.
-
-## Author / Project Information
-
-Project maintainer information has not been added to this repository yet.
