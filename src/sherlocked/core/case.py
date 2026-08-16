@@ -63,7 +63,7 @@ class Case:
             "case_id": self.case_id,
             "investigator": self.investigator,
             "description": self.description,
-            "evidence_path": self.evidence_path,
+            "evidence_path": str(self.evidence_path),
             "created_at": self.created_at,
 
             # Forensic investigation data
