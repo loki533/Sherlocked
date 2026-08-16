@@ -15,10 +15,10 @@ dist/
 *.egg-info/
 
 # Runtime investigation data
-cases/
-evidence/
-recovered/
-recovered_files/
+/cases/
+/evidence/
+/recovered/
+/recovered_files/
 
 # Logs
 logs/
