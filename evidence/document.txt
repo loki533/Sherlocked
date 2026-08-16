@@ -1,1 +1,0 @@
-yber forensics is the scientific process of collecting, analyzing, and preserving digital evidence from computers, networks, and mobile devices after a cyber incident. It acts like digital crime scene investigation, helping experts find out how a breach happened, who caused it, and how to present proof in a court of law
