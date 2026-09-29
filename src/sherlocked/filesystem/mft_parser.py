@@ -33,7 +33,7 @@ class MFTParser:
         mft_cluster = int.from_bytes(boot_sector[48:56], "little")
 
         raw_record_size = int.from_bytes(
-            boot_sector[64:65], "little", signed=True
+            boot_sector[64:65], "little", signed=True           
         )
         if raw_record_size > 0:
             record_size = raw_record_size * cluster_size
@@ -74,6 +74,9 @@ class MFTParser:
             if fixed[sector_end:sector_end + 2] != sequence:
                 # Do not silently repair a record whose sector trailer
                 # does not contain the expected update sequence number.
+                
+                #USA -> Update Sequence array , used to check for torn disks such as in the case of power failure
+                #easy check is that , the last 2 bytes of the sectors are moved onto usa , therefore incase of a power failure ... they wont match
                 return record
 
             replacement_start = usa_offset + i * 2
@@ -126,7 +129,11 @@ class MFTParser:
             if attr_length < 24 or offset + attr_length > len(record):
                 break
 
-            resident = record[offset + 8] == 0
+            resident = record[offset + 8] == 0 
+
+            #NTFS allows 1kb of data to be stored directly 
+            #if larger than 1kb , the clusters pointing to the actual data is stored i.e non resident data
+
             attr_id = int.from_bytes(record[offset + 14:offset + 16], "little")
 
             parsed = None
@@ -224,6 +231,7 @@ class MFTParser:
             record["flags_decoded"] = self.decode_flags(record["flags"])
             record.pop("raw_record")
 
+            #can have multiple file names , windows keeps a POSIX case-name ,win32 name and sometimes a DOS8.3 name
             file_names = [
                 attr["data"]
                 for attr in record["attributes"]
