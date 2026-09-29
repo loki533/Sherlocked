@@ -23,6 +23,7 @@ class Case:
         self.metadata = []
         self.timeline = []
         self.recovered_files = []
+        self.mft_records = []
 
     @staticmethod
     def _serialize(value):
@@ -71,6 +72,7 @@ class Case:
             "metadata": self.metadata,
             "timeline": self.timeline,
             "recovered_files": self.recovered_files,
+            "mft_records": self.mft_records,
         })
 
     @staticmethod
@@ -108,6 +110,11 @@ class Case:
 
         case.recovered_files = data.get(
             "recovered_files",
+            []
+        )
+
+        case.mft_records = data.get(
+            "mft_records",
             []
         )
 

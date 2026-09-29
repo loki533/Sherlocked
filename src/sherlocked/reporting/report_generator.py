@@ -94,6 +94,7 @@ class ReportGenerator:
             "metadata": getattr(case, "metadata", []),
             "timeline": getattr(case, "timeline", []),
             "recovered_files": getattr(case, "recovered_files", []),
+            "mft_records": getattr(case, "mft_records", []),
         }
 
     @staticmethod
@@ -112,6 +113,7 @@ class ReportGenerator:
         metadata = data.get("metadata", [])
         timeline = data.get("timeline", [])
         recovered_files = data.get("recovered_files", [])
+        mft_records = data.get("mft_records", [])
 
         lines = []
 
@@ -201,6 +203,25 @@ class ReportGenerator:
                     )
         else:
             lines.append("No timeline events recorded.")
+
+        lines.append("")
+
+        lines.append("## NTFS MFT Records")
+        lines.append("")
+
+        if mft_records:
+            lines.append("| Record | Name | Status | Type | Created | Modified |")
+            lines.append("|---:|---|---|---|---|---|")
+            for record in mft_records:
+                names = record.get("file_names", [])
+                name = names[0].get("filename", "") if names else ""
+                status = "Allocated" if record.get("flags_decoded", {}).get("in_use") else "Deleted/Unused"
+                kind = "Directory" if record.get("flags_decoded", {}).get("directory") else "File"
+                created = names[0].get("created", "") if names else ""
+                modified = names[0].get("modified", "") if names else ""
+                lines.append(f"| {record.get('record_number')} | `{name}` | {status} | {kind} | {created} | {modified} |")
+        else:
+            lines.append("No MFT records recorded.")
 
         lines.append("")
 
