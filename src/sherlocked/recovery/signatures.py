@@ -19,6 +19,7 @@ class SignatureAnalyzer:
         b"SQLite format 3\x00": "SQLite database",
         b"RIFF": "RIFF container",
         b"ID3": "MP3 audio",
+        b"MZ": "Windows Executable"
     }
 
     @classmethod

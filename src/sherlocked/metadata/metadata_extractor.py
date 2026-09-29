@@ -24,7 +24,7 @@ class MetadataExtractor:
 
             "size_bytes": stat.st_size,
 
-            "created": datetime.fromtimestamp(stat.st_ctime).isoformat(),
+            "created": datetime.fromtimestamp(stat.st_ctime).isoformat(),#linux : means change time
 
             "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
 

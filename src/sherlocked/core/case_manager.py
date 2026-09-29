@@ -3,7 +3,7 @@ import json
 from sherlocked.core.case import Case
 from sherlocked.utils.paths import CASES_DIR
 from sherlocked.core.logger import logger
-import os
+
 
 
 class CaseManager:
@@ -70,7 +70,7 @@ class CaseManager:
 
         print("\nExisting Cases")
 
-        for i, folder in enumerate(cases, start=1):
+        for i, folder in enumerate(cases, start=1): #default value is from 0
 
             print(f"{i}. {folder.name}")
 

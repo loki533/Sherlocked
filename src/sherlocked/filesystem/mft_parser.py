@@ -1,19 +1,6 @@
-import hashlib
-from io import BytesIO
 from pathlib import Path
-import struct
-import pycdlib
-from datetime import datetime, timedelta
 from sherlocked.utils.time_utils import filetime_to_datetime
 
-def filetime_to_datetime(filetime):
-
-    if filetime == 0:
-        return None
-
-    return datetime(1601, 1, 1) + timedelta(
-        microseconds=filetime / 10
-    )
 
 class MFTParser:
 
@@ -224,10 +211,10 @@ class MFTParser:
 
         parent_reference = int.from_bytes(record[start:start+8],"little")
 
-        created = filetime_to_datetime(int.from_bytes(record[start+8:start+16],"little"))
-        modified = filetime_to_datetime(int.from_bytes(record[start+16 : start+24],"little"))
-        mft_modified = filetime_to_datetime(int.from_bytes(record[start+24 : start+32],"little"))
-        accessed = filetime_to_datetime(int.from_bytes(record[start+32 : start+40],"little"))
+        created = int.from_bytes(record[start+8:start+16],"little")
+        modified = int.from_bytes(record[start+16 : start+24],"little")
+        mft_modified = int.from_bytes(record[start+24 : start+32],"little")
+        accessed = int.from_bytes(record[start+32 : start+40],"little")
 
         allocated_size = int.from_bytes(record[start+40 : start+48],"little")
         real_size = int.from_bytes(record[start+48 : start+56],"little")
@@ -267,6 +254,7 @@ class MFTParser:
 
             attributes = self.parse_attributes(record["raw_record"])
             record["attributes"] = attributes
+            record["flags_decoded"] = self.decode_flags(record["flags"])
             record.pop("raw_record")
 
             records.append(record)

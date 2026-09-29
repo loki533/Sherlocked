@@ -29,11 +29,11 @@ class Case:
         """
         Convert objects that are not natively JSON serializable
         into JSON-compatible representations.
+        Recursivley traverses through dictionary values such as path
         """
 
         if isinstance(value, Path):
             return str(value)
-
         if isinstance(value, dict):
             return {
                 key: Case._serialize(val)
@@ -88,7 +88,7 @@ class Case:
 
         case.created_at = data.get(
             "created_at",
-            case.created_at
+            case.created_at #default value
         )
 
         case.hashes = data.get(
