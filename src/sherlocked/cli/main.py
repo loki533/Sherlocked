@@ -20,6 +20,7 @@ from sherlocked.artifacts.chrome import ChromeArtifacts
 
 from sherlocked.filesystem.image_analysis import RawImageAnalyzer
 from sherlocked.filesystem.mft_parser import MFTParser
+from sherlocked.filesystem.deleted_file_analyzer import DeletedFileAnalyzer
 
 
 def main():
@@ -31,6 +32,7 @@ def main():
 
     manager = CaseManager()
     evidence_analyzer = EvidenceAnalyzer()
+    deleted_file_analyzer = DeletedFileAnalyzer()
 
     current_case = None
 
@@ -450,37 +452,47 @@ def main():
 
                 records = parser.scan_mft(max_records=max_records)
                 current_case.mft_records = records
+
+                deleted_candidates = deleted_file_analyzer.analyze(records)
+                current_case.deleted_files = deleted_file_analyzer.unique_files(
+                    deleted_candidates
+                )
                 manager.save_case(current_case)
 
-                deleted = [
-                    r for r in records
-                    if not r["flags_decoded"]["in_use"]
-                ]
+                summary = deleted_file_analyzer.summary(
+                    current_case.deleted_files
+                )
 
                 console.print(
                     f"\n[bold green]✓ Parsed {len(records)} MFT records[/bold green]"
                 )
                 console.print(
-                    f"[yellow]Unused/deleted records: {len(deleted)}[/yellow]"
+                    f"[yellow]Deleted/unused candidates: {summary['total']} "
+                    f"({summary['files']} files, "
+                    f"{summary['directories']} directories)[/yellow]"
                 )
 
-                for record in records[:25]:
-                    names = record.get("file_names", [])
-                    name = names[0]["filename"] if names else "<unnamed>"
-                    state = (
-                        "ALLOC"
-                        if record["flags_decoded"]["in_use"]
-                        else "DELETED"
-                    )
+                console.print("\n[bold cyan]Deleted / Unused Candidates[/bold cyan]")
+                for candidate in current_case.deleted_files[:25]:
+                    name = candidate.get("filename") or "<unnamed>"
+                    kind = candidate.get("type", "file").upper()
+                    size = candidate.get("real_size")
+                    size_text = "?" if size is None else f"{size:,}"
                     console.print(
-                        f"#{record['record_number']:>6} | "
-                        f"{state:<7} | {name}"
+                        f"#{candidate.get('record_number'):>6} | "
+                        f"{kind:<9} | {size_text:>10} bytes | {name}"
                     )
 
-                if len(records) > 25:
+                if len(current_case.deleted_files) > 25:
                     console.print(
-                        f"... {len(records) - 25} more records saved to the case."
+                        f"... {len(current_case.deleted_files) - 25} more "
+                        "deleted/unused candidates saved to the case."
                     )
+
+                console.print(
+                    "\n[dim]These are MFT candidates, not yet recovered files. "
+                    "Content recovery is the next milestone.[/dim]"
+                )
 
             except (ValueError, StopIteration) as exc:
                 console.print(

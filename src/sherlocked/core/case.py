@@ -24,6 +24,7 @@ class Case:
         self.timeline = []
         self.recovered_files = []
         self.mft_records = []
+        self.deleted_files = []
 
     @staticmethod
     def _serialize(value):
@@ -35,6 +36,8 @@ class Case:
 
         if isinstance(value, Path):
             return str(value)
+        if isinstance(value, bytes):
+            return {"encoding": "hex", "data": value.hex()}
         if isinstance(value, dict):
             return {
                 key: Case._serialize(val)
@@ -73,6 +76,7 @@ class Case:
             "timeline": self.timeline,
             "recovered_files": self.recovered_files,
             "mft_records": self.mft_records,
+            "deleted_files": self.deleted_files,
         })
 
     @staticmethod
@@ -115,6 +119,11 @@ class Case:
 
         case.mft_records = data.get(
             "mft_records",
+            []
+        )
+
+        case.deleted_files = data.get(
+            "deleted_files",
             []
         )
 

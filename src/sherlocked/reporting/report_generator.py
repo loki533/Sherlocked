@@ -114,6 +114,7 @@ class ReportGenerator:
         timeline = data.get("timeline", [])
         recovered_files = data.get("recovered_files", [])
         mft_records = data.get("mft_records", [])
+        deleted_files = data.get("deleted_files", [])
 
         lines = []
 
@@ -222,6 +223,28 @@ class ReportGenerator:
                 lines.append(f"| {record.get('record_number')} | `{name}` | {status} | {kind} | {created} | {modified} |")
         else:
             lines.append("No MFT records recorded.")
+
+        lines.append("")
+
+        lines.append("## Deleted / Unused MFT Candidates")
+        lines.append("")
+
+        if deleted_files:
+            lines.append("| Record | Name | Type | Parent | Size | Status |")
+            lines.append("|---:|---|---|---:|---:|---|")
+            for item in deleted_files:
+                name = item.get("filename") or "<unnamed>"
+                kind = item.get("type", "file")
+                parent = item.get("parent_record")
+                size = item.get("real_size")
+                size = "" if size is None else size
+                lines.append(
+                    f"| {item.get('record_number')} | `{name}` | {kind} | "
+                    f"{parent if parent is not None else ''} | {size} | "
+                    f"{item.get('status', 'deleted_or_unused')} |"
+                )
+        else:
+            lines.append("No deleted/unused MFT candidates recorded.")
 
         lines.append("")
 
