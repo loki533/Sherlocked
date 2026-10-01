@@ -38,7 +38,8 @@ def show_menu():
     console.print("[green]6.[/green] 📑 Extract Browser Downloads")
     console.print("[green]7.[/green] 🔍 Scan Disk Image")
     console.print("[green]8.[/green] 🧬 Parse Master File Table (MFT)")
-    console.print("[green]9.[/green] 📑 Generate Report")
-    console.print("[green]10.[/green] 🚪 Exit")
+    console.print("[green]9.[/green] 🧩 Carve Files from Disk Image")
+    console.print("[green]10.[/green] 📑 Generate Report")
+    console.print("[green]11.[/green] 🚪 Exit")
 
     return input("\nChoice: ")

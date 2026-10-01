@@ -25,6 +25,7 @@ class Case:
         self.recovered_files = []
         self.mft_records = []
         self.deleted_files = []
+        self.carved_files = []
 
     @staticmethod
     def _serialize(value):
@@ -77,6 +78,7 @@ class Case:
             "recovered_files": self.recovered_files,
             "mft_records": self.mft_records,
             "deleted_files": self.deleted_files,
+            "carved_files": self.carved_files,
         })
 
     @staticmethod
@@ -124,6 +126,11 @@ class Case:
 
         case.deleted_files = data.get(
             "deleted_files",
+            []
+        )
+
+        case.carved_files = data.get(
+            "carved_files",
             []
         )
 

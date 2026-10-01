@@ -115,6 +115,7 @@ class ReportGenerator:
         recovered_files = data.get("recovered_files", [])
         mft_records = data.get("mft_records", [])
         deleted_files = data.get("deleted_files", [])
+        carved_files = data.get("carved_files", [])
 
         lines = []
 
@@ -246,6 +247,17 @@ class ReportGenerator:
         else:
             lines.append("No deleted/unused MFT candidates recorded.")
 
+        lines.append("")
+
+        lines.append("## Carved File Candidates")
+        lines.append("")
+        if carved_files:
+            lines.append("| Offset | Type | Size | Validation | Output |")
+            lines.append("|---:|---|---:|---|---|")
+            for item in carved_files:
+                lines.append(f"| {item.get('offset', '')} | {item.get('extension', '')} | {item.get('size', '')} | {item.get('validation', '')} | `{item.get('output_path', '')}` |")
+        else:
+            lines.append("No carved file candidates recorded.")
         lines.append("")
 
         lines.append("## Recovered Files")

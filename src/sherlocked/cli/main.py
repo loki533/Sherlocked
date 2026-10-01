@@ -21,6 +21,7 @@ from sherlocked.artifacts.chrome import ChromeArtifacts
 from sherlocked.filesystem.image_analysis import RawImageAnalyzer
 from sherlocked.filesystem.mft_parser import MFTParser
 from sherlocked.filesystem.deleted_file_analyzer import DeletedFileAnalyzer
+from sherlocked.recovery.file_carver import FileCarver
 
 
 def main():
@@ -505,48 +506,33 @@ def main():
                 )
 
         elif choice == "9":
-
             if current_case is None:
-                console.print(
-                    "[bold red]Create or open a case first![/bold red]"
-                )
-            else:
-                try:
-                    report = ReportGenerator.generate(current_case)
-
-                    console.print(
-                        "\n[bold green]"
-                        "✓ Report generated successfully:"
-                        "[/bold green]"
-                    )
-                    console.print(str(report))
-
-                    if report.exists():
-                        webbrowser.open(report.resolve().as_uri())
-
-                except Exception as exc:
-                    logger.exception("Report generation failed")
-                    console.print(
-                        f"[bold red]Report generation failed: {exc}[/bold red]"
-                    )
-
-        # ---------------------------------------------------------
-        # 10. EXIT
-        # ---------------------------------------------------------
+                console.print("[bold red]Create or open a case first![/bold red]"); continue
+            image_path=Path(current_case.evidence_path)
+            if image_path.is_dir(): image_path=image_path/"windows_disk.dd"
+            if not image_path.exists(): console.print(f"[bold red]Disk image not found: {image_path}[/bold red]"); continue
+            try:
+                output_dir=Path("cases")/str(current_case.case_id)/"carved"
+                max_candidates=int(input("Maximum carved files [default 25]: ") or "25")
+                results=FileCarver(image_path).carve_all(output_dir=output_dir,max_candidates=max_candidates)
+                current_case.carved_files.extend(results); manager.save_case(current_case)
+                console.print(f"\n[bold green]✓ Carving completed: {len(results)} validated candidates[/bold green]")
+                for item in results: console.print(f"{item['extension'].upper():<4} | offset={item['offset']:,} | {item['size']:,} bytes | {item.get('output_path','')}")
+                if not results: console.print("[yellow]No supported file candidates were validated.[/yellow]")
+            except (ValueError,OSError) as exc:
+                logger.exception("File carving failed"); console.print(f"[bold red]File carving failed: {exc}[/bold red]")
 
         elif choice == "10":
+            if current_case is None: console.print("[bold red]Create or open a case first![/bold red]")
+            else:
+                try:
+                    report=ReportGenerator.generate(current_case); console.print("\n[bold green]✓ Report generated successfully:[/bold green]"); console.print(str(report))
+                    if report.exists(): webbrowser.open(report.resolve().as_uri())
+                except Exception as exc:
+                    logger.exception("Report generation failed"); console.print(f"[bold red]Report generation failed: {exc}[/bold red]")
 
-            logger.info(
-                "Sherlocked application closed"
-            )
-
-            console.print(
-                "\n[bold cyan]"
-                "Sherlocked closed."
-                "[/bold cyan]"
-            )
-
-            break
+        elif choice == "11":
+            logger.info("Sherlocked application closed"); console.print("\n[bold cyan]Sherlocked closed.[/bold cyan]"); break
 
         # ---------------------------------------------------------
         # INVALID OPTION
