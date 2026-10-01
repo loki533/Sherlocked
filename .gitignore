@@ -27,6 +27,8 @@ dist/
 logs/
 *.log
 
+notes.txt
+
 # IDE
 .vscode/
 .idea/
